@@ -1,6 +1,6 @@
-import img1 from "./img/Imagen1.jpeg";
-import img2 from "./img/Imagen2.jpg";
-import img3 from "./img/Imagen3.jpg";
+import img1 from "./img/img1.png";
+import img2 from "./img/img2.png";
+import img3 from "./img/img3.png";
 
 const data = {
     productData: [
@@ -14,14 +14,14 @@ const data = {
         {
             id: 2,
             img: img2,
-            title: "Doritos",
+            title: "Doritos Nachos",
             desc: "",
             price: 18,
         },
         {
             id: 3,
             img: img3,
-            title: "Mantecadas",
+            title: "Yogurt LALA fresa",
             desc: "",
             price: 20,
         },
