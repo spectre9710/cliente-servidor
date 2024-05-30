@@ -6,12 +6,17 @@ const Login = () => {
 	const [data, setData] = useState({ email: "", password: "" });
 	const [error, setError] = useState("");
 
-	const handleChange = () => {
-		
+	const handleChange = (e) => {
+		const { name, value } = e.target;
+		setData((prevData) => ({
+			...prevData,
+			[name]: value,
+		}));
 	};
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
+		// Aquí puedes añadir la lógica para enviar los datos del formulario
 	};
 
 	return (
@@ -22,7 +27,7 @@ const Login = () => {
 						<h1>Ingrese a su cuenta</h1>
 						<input
 							type="email"
-							placeholder="Correo Electróniico"
+							placeholder="Correo Electrónico"
 							name="email"
 							onChange={handleChange}
 							value={data.email}

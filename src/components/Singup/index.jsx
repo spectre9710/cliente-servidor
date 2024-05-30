@@ -12,12 +12,17 @@ const Signup = () => {
 	const [error, setError] = useState("");
 	const navigate = useNavigate();
 
-	const handleChange = () => {
-
+	const handleChange = (e) => {
+		const { name, value } = e.target;
+		setData((prevData) => ({
+			...prevData,
+			[name]: value,
+		}));
 	};
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
+		// Aquí puedes añadir la lógica para enviar los datos del formulario
 	};
 
 	return (
