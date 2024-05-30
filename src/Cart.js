@@ -1,7 +1,11 @@
-import React from 'react'
-import { useCart } from 'react-use-cart'
+import React, { useState } from 'react';
+import { useCart } from 'react-use-cart';
+import { Modal, Button } from 'react-bootstrap';
 
 const Cart = () => {
+    const [showConfirmModal, setShowConfirmModal] = useState(false);
+    const [showSuccessModal, setShowSuccessModal] = useState(false);
+
     const {
         isEmpty,
         totalUniqueItems,
@@ -12,40 +16,54 @@ const Cart = () => {
         removeItem,
         emptyCart,
     } = useCart();
-    if (isEmpty) return <h1 className='text-center'>Tu carrito esta vacio</h1>
+
+    const handleCloseConfirmModal = () => setShowConfirmModal(false);
+    const handleShowConfirmModal = () => setShowConfirmModal(true);
+
+    const handleConfirmPurchase = () => {
+        handleCloseConfirmModal();
+        setShowSuccessModal(true);
+        // Aquí puedes agregar la lógica para procesar la compra
+    };
+
+    const handleCloseSuccessModal = () => {
+        setShowSuccessModal(false);
+        emptyCart(); // Limpia el carrito después de una compra exitosa
+    };
+
+    if (isEmpty) return <h1 className='text-center'>Tu carrito esta vacío</h1>;
+
     return (
         <section className='py-4 container'>
             <div className='row justify-content-center'>
                 <div className='col-12'>
-                    <h5>Productos ({totalUniqueItems}) Total de articulos: ({totalItems})</h5>
+                    <h5>Productos ({totalUniqueItems}) Total de artículos: ({totalItems})</h5>
                     <table className='table table-light table-hover m-0'>
                         <tbody>
-                            {items.map((item, index) => {
-                                return (
-                                    <tr key={index}>
-                                        <td>
-                                            <img src={item.img} style={{ height: "6rem" }} />
-                                        </td>
-                                        <td>{item.title}</td>
-                                        <td>{item.price}</td>
-                                        <td>Cantitad ({item.quantity})</td>
-                                        <td>
-                                            <button
-                                                className='btn btn-info ms-2'
-                                                onClick={() => updateItemQuantity(item.id, item.quantity - 1)}
-                                            >-</button>
-                                            <button
-                                                className='btn btn-info ms-2'
-                                                onClick={() => updateItemQuantity(item.id, item.quantity + 1)}
-                                            >+</button>
-                                            <button
-                                                className='btn btn-danger ms-2'
-                                                onClick={() => removeItem(item.id)}
-                                            >Eliminar producto</button>
-                                        </td>
-                                    </tr>
-                                )
-                            })}
+                            {items.map((item, index) => (
+                                <tr key={index}>
+                                    <td>
+                                        <img src={item.img} style={{ height: "6rem" }} alt={item.title} />
+                                    </td>
+                                    <td>{item.title}</td>
+                                    <td>{item.price}</td>
+                                    <td>Cantidad ({item.quantity})</td>
+                                    <td>
+                                        <button
+                                            className='btn btn-info ms-2'
+                                            onClick={() => updateItemQuantity(item.id, item.quantity - 1)}
+                                        >-</button>
+                                        <button
+                                            className='btn btn-info ms-2'
+                                            onClick={() => updateItemQuantity(item.id, item.quantity + 1)}
+                                        >+</button>
+                                        <button
+                                            className='btn btn-danger ms-2'
+                                            onClick={() => removeItem(item.id)}
+                                        >Eliminar producto</button>
+                                    </td>
+                                </tr>
+                            ))}
                         </tbody>
                     </table>
                 </div>
@@ -57,11 +75,47 @@ const Cart = () => {
                         className='btn btn-danger m-2'
                         onClick={() => emptyCart()}
                     >Limpiar carrito</button>
-                    <button className='btn btn-primary m-2'>Pagar ahora</button>
+                    <button
+                        className='btn btn-primary m-2'
+                        onClick={handleShowConfirmModal}
+                    >Pagar ahora</button>
                 </div>
             </div>
+
+            {/* Modal de confirmación */}
+            <Modal show={showConfirmModal} onHide={handleCloseConfirmModal}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Confirmar compra</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    ¿Estás seguro de que deseas realizar la compra?
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={handleCloseConfirmModal}>
+                        Cancelar
+                    </Button>
+                    <Button variant="primary" onClick={handleConfirmPurchase}>
+                        Aceptar
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+
+            {/* Modal de éxito */}
+            <Modal show={showSuccessModal} onHide={handleCloseSuccessModal}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Compra realizada</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    ¡Tu compra ha sido realizada con éxito!
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="primary" onClick={handleCloseSuccessModal}>
+                        Cerrar
+                    </Button>
+                </Modal.Footer>
+            </Modal>
         </section>
     );
 };
 
-export default Cart
+export default Cart;
