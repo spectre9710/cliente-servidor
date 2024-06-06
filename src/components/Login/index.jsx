@@ -1,10 +1,11 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import styles from "./styles.module.css";
 
 const Login = () => {
 	const [data, setData] = useState({ email: "", password: "" });
 	const [error, setError] = useState("");
+	const navigate = useNavigate();
 
 	const handleChange = (e) => {
 		const { name, value } = e.target;
@@ -17,6 +18,20 @@ const Login = () => {
 	const handleSubmit = async (e) => {
 		e.preventDefault();
 		// Aquí puedes añadir la lógica para enviar los datos del formulario
+		try {
+			const users = JSON.parse(localStorage.getItem("users")) || [];
+			const user = users.find(user => user.email === data.email && user.password === data.password);
+			if (user) {
+				// Guardar token de sesión en localStorage
+				localStorage.setItem("token", JSON.stringify(user));
+				// Redirigir al usuario al dashboard
+				navigate("/");
+			} else {
+				setError("Credenciales incorrectas. Inténtalo de nuevo.");
+			}
+		} catch (error) {
+			setError("Error al iniciar sesión. Inténtalo de nuevo.");
+		}
 	};
 
 	return (

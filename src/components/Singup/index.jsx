@@ -23,6 +23,23 @@ const Signup = () => {
 	const handleSubmit = async (e) => {
 		e.preventDefault();
 		// Aquí puedes añadir la lógica para enviar los datos del formulario
+		try {
+			// Obtener los usuarios almacenados en localStorage
+			const users = JSON.parse(localStorage.getItem("users")) || [];
+			// Verificar si el usuario ya existe
+			const userExists = users.some(user => user.email === data.email);
+			if (userExists) {
+				setError("El usuario ya existe. Por favor, inicia sesión.");
+				return;
+			}
+			// Agregar el nuevo usuario
+			users.push(data);
+			localStorage.setItem("users", JSON.stringify(users));
+			// Redirigir al usuario al login
+			navigate("/login");
+		} catch (error) {
+			setError("Error al registrarse. Inténtalo de nuevo.");
+		}
 	};
 
 	return (
