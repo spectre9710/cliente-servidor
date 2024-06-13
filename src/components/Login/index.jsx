@@ -1,80 +1,71 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
+import { Link } from "react-router-dom";
 import styles from "./styles.module.css";
 
 const Login = () => {
-	const [data, setData] = useState({ email: "", password: "" });
-	const [error, setError] = useState("");
-	const navigate = useNavigate();
+    const [data, setData] = useState({ email: "", password: "" });
+    const [error, setError] = useState("");
 
-	const handleChange = (e) => {
-		const { name, value } = e.target;
-		setData((prevData) => ({
-			...prevData,
-			[name]: value,
-		}));
-	};
+    const handleChange = ({ currentTarget: input }) => {
+        setData({ ...data, [input.name]: input.value });
+    };
 
-	const handleSubmit = async (e) => {
-		e.preventDefault();
-		// Aquí puedes añadir la lógica para enviar los datos del formulario
-		try {
-			const users = JSON.parse(localStorage.getItem("users")) || [];
-			const user = users.find(user => user.email === data.email && user.password === data.password);
-			if (user) {
-				// Guardar token de sesión en localStorage
-				localStorage.setItem("token", JSON.stringify(user));
-				// Redirigir al usuario al dashboard
-				navigate("/");
-			} else {
-				setError("Credenciales incorrectas. Inténtalo de nuevo.");
-			}
-		} catch (error) {
-			setError("Error al iniciar sesión. Inténtalo de nuevo.");
-		}
-	};
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        try {
+            const url = "http://localhost:3001/usuario/login";
+            const { data: res } = await axios.post(url, data);
+            localStorage.setItem("token", res.token);  // Guarda el token en localStorage
+            window.location = "/";
+        } catch (error) {
+            if (error.response && error.response.status >= 400 && error.response.status <= 500) {
+                setError(error.response.data.message);
+            }
+        }
+    };
 
-	return (
-		<div className={styles.login_container}>
-			<div className={styles.login_form_container}>
-				<div className={styles.left}>
-					<form className={styles.form_container} onSubmit={handleSubmit}>
-						<h1>Ingrese a su cuenta</h1>
-						<input
-							type="email"
-							placeholder="Correo Electrónico"
-							name="email"
-							onChange={handleChange}
-							value={data.email}
-							required
-							className={styles.input}
-						/>
-						<input
-							type="password"
-							placeholder="Contraseña"
-							name="password"
-							onChange={handleChange}
-							value={data.password}
-							required
-							className={styles.input}
-						/>
-						{error && <div className={styles.error_msg}>{error}</div>}
-						<button type="submit" className={styles.green_btn}>
-							Iniciar sesión
-						</button>
-					</form>
-				</div>
-				<div className={styles.right}>
-					<h1>¿Nuevo aquí?</h1>
-					<Link to="/signup">
-						<button type="button" className={styles.white_btn}>
-							Registrarse
-						</button>
-					</Link>
-				</div>
-			</div>
-		</div>
-	);
+    return (
+        <div className={styles.login_container}>
+            <div className={styles.login_form_container}>
+                <div className={styles.left}>
+                    <form className={styles.form_container} onSubmit={handleSubmit}>
+                        <h1>Ingrese a su cuenta</h1>
+                        <input
+                            type="email"
+                            placeholder="Email"
+                            name="email"
+                            onChange={handleChange}
+                            value={data.email}
+                            required
+                            className={styles.input}
+                        />
+                        <input
+                            type="password"
+                            placeholder="Contraseña"
+                            name="password"
+                            onChange={handleChange}
+                            value={data.password}
+                            required
+                            className={styles.input}
+                        />
+                        {error && <div className={styles.error_msg}>{error}</div>}
+                        <button type="submit" className={styles.green_btn}>
+                            Iniciar sesión
+                        </button>
+                    </form>
+                </div>
+                <div className={styles.right}>
+                    <h1>¿Nuevo aquí?</h1>
+                    <Link to="/signup">
+                        <button type="button" className={styles.white_btn}>
+                            Registrarse
+                        </button>
+                    </Link>
+                </div>
+            </div>
+        </div>
+    );
 };
 
 export default Login;

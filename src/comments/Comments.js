@@ -21,6 +21,7 @@ const Comments = ({ commentsUrl, currentUserId }) => {
         (a, b) =>
           new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
       );
+
   const addComment = (text, parentId) => {
     createCommentApi(text, parentId).then((comment) => {
       setBackendComments([comment, ...backendComments]);
@@ -29,7 +30,7 @@ const Comments = ({ commentsUrl, currentUserId }) => {
   };
 
   const updateComment = (text, commentId) => {
-    updateCommentApi(text).then(() => {
+    updateCommentApi(text, commentId).then(() => {
       const updatedBackendComments = backendComments.map((backendComment) => {
         if (backendComment.id === commentId) {
           return { ...backendComment, body: text };
@@ -40,9 +41,10 @@ const Comments = ({ commentsUrl, currentUserId }) => {
       setActiveComment(null);
     });
   };
+
   const deleteComment = (commentId) => {
     if (window.confirm("¿Estas seguro que quieres eliminar este comentario?")) {
-      deleteCommentApi().then(() => {
+      deleteCommentApi(commentId).then(() => {
         const updatedBackendComments = backendComments.filter(
           (backendComment) => backendComment.id !== commentId
         );
@@ -63,24 +65,26 @@ const Comments = ({ commentsUrl, currentUserId }) => {
       <div className="comment-form-title">Agrega un comentario</div>
       <CommentForm submitLabel="Comentar" handleSubmit={addComment} />
       <div className="comments-container">
-        {rootComments.map((rootComment) => (
-          <Comment
-            key={rootComment.id}
-            comment={rootComment}
-            replies={getReplies(rootComment.id)}
-            activeComment={activeComment}
-            setActiveComment={setActiveComment}
-            addComment={addComment}
-            deleteComment={deleteComment}
-            updateComment={updateComment}
-            currentUserId={currentUserId}
-          />
-        ))}
+        {rootComments.length === 0 ? (
+          <div className="no-comments">No hay comentarios aún</div>
+        ) : (
+          rootComments.map((rootComment) => (
+            <Comment
+              key={rootComment.id}
+              comment={rootComment}
+              replies={getReplies(rootComment.id)}
+              activeComment={activeComment}
+              setActiveComment={setActiveComment}
+              addComment={addComment}
+              deleteComment={deleteComment}
+              updateComment={updateComment}
+              currentUserId={currentUserId}
+            />
+          ))
+        )}
       </div>
     </div>
   );
 };
 
 export default Comments;
-
-

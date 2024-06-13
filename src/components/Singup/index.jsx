@@ -1,106 +1,85 @@
 import { useState } from "react";
+import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import styles from "./styles.module.css";
 
 const Signup = () => {
-	const [data, setData] = useState({
-		firstName: "",
-		lastName: "",
-		email: "",
-		password: "",
-	});
-	const [error, setError] = useState("");
-	const navigate = useNavigate();
+    const [data, setData] = useState({
+        username: "",
+        email: "",
+        password: "",
+    });
+    const [error, setError] = useState("");
+    const navigate = useNavigate();
 
-	const handleChange = (e) => {
-		const { name, value } = e.target;
-		setData((prevData) => ({
-			...prevData,
-			[name]: value,
-		}));
-	};
+    const handleChange = ({ currentTarget: input }) => {
+        setData({ ...data, [input.name]: input.value });
+    };
 
-	const handleSubmit = async (e) => {
-		e.preventDefault();
-		// Aquí puedes añadir la lógica para enviar los datos del formulario
-		try {
-			// Obtener los usuarios almacenados en localStorage
-			const users = JSON.parse(localStorage.getItem("users")) || [];
-			// Verificar si el usuario ya existe
-			const userExists = users.some(user => user.email === data.email);
-			if (userExists) {
-				setError("El usuario ya existe. Por favor, inicia sesión.");
-				return;
-			}
-			// Agregar el nuevo usuario
-			users.push(data);
-			localStorage.setItem("users", JSON.stringify(users));
-			// Redirigir al usuario al login
-			navigate("/login");
-		} catch (error) {
-			setError("Error al registrarse. Inténtalo de nuevo.");
-		}
-	};
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        try {
+            const url = "http://localhost:3001/usuario/register";
+            const { data: res } = await axios.post(url, data);
+            navigate("/login");
+            console.log(res.message);
+        } catch (error) {
+            if (error.response && error.response.status >= 400 && error.response.status <= 500) {
+                setError(error.response.data.message);
+            }
+        }
+    };
 
-	return (
-		<div className={styles.signup_container}>
-			<div className={styles.signup_form_container}>
-				<div className={styles.left}>
-					<h1>Bienvenido de nuevo</h1>
-					<Link to="/login">
-						<button type="button" className={styles.white_btn}>
-							Iniciar sesión
-						</button>
-					</Link>
-				</div>
-				<div className={styles.right}>
-					<form className={styles.form_container} onSubmit={handleSubmit}>
-						<h1>Crea una cuenta</h1>
-						<input
-							type="text"
-							placeholder="Nombre"
-							name="firstName"
-							onChange={handleChange}
-							value={data.firstName}
-							required
-							className={styles.input}
-						/>
-						<input
-							type="text"
-							placeholder="Apellido"
-							name="lastName"
-							onChange={handleChange}
-							value={data.lastName}
-							required
-							className={styles.input}
-						/>
-						<input
-							type="email"
-							placeholder="Correo Electrónico"
-							name="email"
-							onChange={handleChange}
-							value={data.email}
-							required
-							className={styles.input}
-						/>
-						<input
-							type="password"
-							placeholder="Contraseña"
-							name="password"
-							onChange={handleChange}
-							value={data.password}
-							required
-							className={styles.input}
-						/>
-						{error && <div className={styles.error_msg}>{error}</div>}
-						<button type="submit" className={styles.green_btn}>
-							Registrarse
-						</button>
-					</form>
-				</div>
-			</div>
-		</div>
-	);
+    return (
+        <div className={styles.signup_container}>
+            <div className={styles.signup_form_container}>
+                <div className={styles.left}>
+                    <h1>Bienvenido de nuevo</h1>
+                    <Link to="/login">
+                        <button type="button" className={styles.white_btn}>
+                            Iniciar sesión
+                        </button>
+                    </Link>
+                </div>
+                <div className={styles.right}>
+                    <form className={styles.form_container} onSubmit={handleSubmit}>
+                        <h1>Crea una cuenta</h1>
+                        <input
+                            type="text"
+                            placeholder="Nombre"
+                            name="username"
+                            onChange={handleChange}
+                            value={data.username}
+                            required
+                            className={styles.input}
+                        />
+                        <input
+                            type="email"
+                            placeholder="Email"
+                            name="email"
+                            onChange={handleChange}
+                            value={data.email}
+                            required
+                            className={styles.input}
+                        />
+                        <input
+                            type="password"
+                            placeholder="Contraseña"
+                            name="password"
+                            onChange={handleChange}
+                            value={data.password}
+                            required
+                            className={styles.input}
+                        />
+                        {error && <div className={styles.error_msg}>{error}</div>}
+                        <button type="submit" className={styles.green_btn}>
+                            Registrarse
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    );
 };
 
 export default Signup;

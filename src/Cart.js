@@ -1,6 +1,8 @@
+// Cart.js
 import React, { useState } from 'react';
 import { useCart } from 'react-use-cart';
 import { Modal, Button } from 'react-bootstrap';
+import axios from 'axios';
 
 const Cart = () => {
     const [showConfirmModal, setShowConfirmModal] = useState(false);
@@ -20,10 +22,20 @@ const Cart = () => {
     const handleCloseConfirmModal = () => setShowConfirmModal(false);
     const handleShowConfirmModal = () => setShowConfirmModal(true);
 
-    const handleConfirmPurchase = () => {
+    const handleConfirmPurchase = async () => {
         handleCloseConfirmModal();
-        setShowSuccessModal(true);
-        // Aquí puedes agregar la lógica para procesar la compra
+        try {
+            const purchases = items.map(item => ({
+                productId: item.id,
+                quantity: item.quantity
+            }));
+
+            await axios.post('http://localhost:3001/compra/compras', { purchases });
+
+            setShowSuccessModal(true);
+        } catch (error) {
+            console.error('Error al realizar la compra:', error);
+        }
     };
 
     const handleCloseSuccessModal = () => {
@@ -43,10 +55,10 @@ const Cart = () => {
                             {items.map((item, index) => (
                                 <tr key={index}>
                                     <td>
-                                        <img src={item.img} style={{ height: "6rem" }} alt={item.title} />
+                                        <img src={item.img} style={{ height: "6rem" }} alt={item.nombre} />
                                     </td>
-                                    <td>{item.title}</td>
-                                    <td>{item.price}</td>
+                                    <td>{item.nombre}</td>
+                                    <td>{item.precio}</td>
                                     <td>Cantidad ({item.quantity})</td>
                                     <td>
                                         <button
